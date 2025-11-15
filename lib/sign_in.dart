@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:live_score_app/home_screen.dart';
+import 'package:live_score_app/sign_up.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -34,7 +35,7 @@ class _SignInState extends State<SignIn> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        hintText: 'Email',
+                        hintText: ' Student Email',
                         suffixIcon: Icon(Icons.email),
                       ),
                       validator: (String? value){
@@ -53,7 +54,7 @@ class _SignInState extends State<SignIn> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        hintText: 'Password',
+                        hintText: ' Student Password',
                         suffixIcon: Icon(Icons.remove_red_eye),
                       ),
                       validator: (String? value){
@@ -78,9 +79,12 @@ class _SignInState extends State<SignIn> {
                   Visibility(
                     visible: _signinInprogress== false,
                     replacement: Center(child: CircularProgressIndicator(),),
-                    child: FilledButton(onPressed:
-                    _onTapSubmitButton, child: Text('Login')),
+                    child:FilledButton(onPressed: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (ctx)=>SignUp()));
+                    }, child: Text('Sign up')),
                   ),
+
+
 
 
                 ],

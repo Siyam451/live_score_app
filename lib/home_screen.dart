@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:live_score_app/sign_in.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,24 +11,38 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<FootballMatch> _matchList = [];
+  List<Studentinfo> _studentList = [];
   bool _isProgress = false;
 
-  @override
-  void initState() {
-    super.initState();
-    FirebaseCrashlytics.instance.log('Entered the home screen');
-  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Live Score'),
+        title: const Text('Student database'),
         backgroundColor: Colors.blueAccent,
+          actions: [
+      PopupMenuButton(
+      icon: const Icon(Icons.more_vert),
+      onSelected: (value) {
+        if (value == "logout") {
+          Navigator.push(context, MaterialPageRoute(builder: (ctx)=>SignIn()));
+          _logout();
+        }
+      },
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: "logout",
+          child: Text("Logout"),
+        ),
+      ],
+
       ),
+    ]
+    ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance.collection('football').snapshots(),
+        stream: FirebaseFirestore.instance.collection('students').snapshots(),
         builder: (context, snapshots) {
           if (snapshots.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -38,105 +52,74 @@ class _HomeScreenState extends State<HomeScreen> {
             return const Center(child: Text('No matches found.'));
           }
 
-          _matchList = snapshots.data!.docs.map((doc) {
-            return FootballMatch(
+          _studentList = snapshots.data!.docs.map((doc) {
+            return Studentinfo(
               id: doc.id,
-              team1: doc.get('team1'),
-              team1Score: doc.get('team1_score'),
-              team2: doc.get('team2'),
-              team2Score: doc.get('team2_score'),
-              winner: doc.get('winner_team'),
-              isRunning: doc.get('is_running'),
+              name: doc.get('name'),
+              rollNumber: doc.get('rollNumber'),
+              course: doc.get('course'),
+              isRunning: doc.get('is running'),
             );
           }).toList();
 
           return ListView.builder(
-            itemCount: _matchList.length,
+            itemCount: _studentList.length,
             itemBuilder: (context, index) {
-              final footballMatch = _matchList[index];
+              final student = _studentList[index];
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 elevation: 3,
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor:
-                    footballMatch.isRunning ? Colors.green : Colors.grey,
+                    student.isRunning ? Colors.green : Colors.grey,
                     child: Icon(
-                      footballMatch.isRunning
+                      student.isRunning
                           ? Icons.sports_soccer
                           : Icons.check,
                       color: Colors.white,
                     ),
                   ),
                   title:
-                  Text('${footballMatch.team1} vs ${footballMatch.team2}'),
-                  trailing: Text(
-                    '${footballMatch.team1Score} - ${footballMatch.team2Score}',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text('Student name: ${student.name}'),
                   subtitle: Text(
-                    'Winner: ${footballMatch.isRunning ? 'Pending' : footballMatch.winner}',
+                    'Course name:${student.rollNumber}\nCourse: ${student.course}',
                   ),
+              trailing: Text(
+              student.isRunning ? "Active" : "Done",
+              style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              ),
                 ),
+                )
               );
             },
           );
         },
       ),
 
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.deepOrange,
-        onPressed: () async {
-          try {
-            // Example: Delete document (for testing)
-            await FirebaseFirestore.instance
-                .collection('football')
-                .doc('USA VS Iran')
-                .delete();
 
-            // Trigger a custom Crashlytics error (for testing only)
-            throw Exception('Manual test exception');
-          } catch (e, s) {
-            debugPrint('----------------FIREBASE CRASHLYTICS----------------');
-            debugPrint('Exception: $e');
-            await FirebaseCrashlytics.instance.recordError(
-              e,
-              s,
-              printDetails: true,
-            );
-          }
-
-          // ✅ FIXED: Firebase Analytics event name must use underscores
-          await FirebaseAnalytics.instance.logEvent(
-            name: 'tap_on_button',
-            parameters: {'button': 'add_match'},
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
     );
+  }
+
+  void _logout()async{
+    await FirebaseAuth.instance.signOut();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Logged out sucessfully')));
   }
 }
 
-class FootballMatch {
+class Studentinfo {
   final String id;
-  final String team1;
-  final int team1Score;
-  final String team2;
-  final int team2Score;
-  final String winner;
+  final String name;
+  final int rollNumber;
+  final String course;
   final bool isRunning;
 
-  FootballMatch({
+  Studentinfo({
     required this.id,
-    required this.team1,
-    required this.team1Score,
-    required this.team2,
-    required this.team2Score,
-    required this.winner,
+    required this.name,
+    required this.rollNumber,
+    required this.course,
     required this.isRunning,
   });
 }

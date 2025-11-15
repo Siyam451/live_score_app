@@ -55,7 +55,7 @@ class _SignUpState extends State<SignUp> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      hintText: 'Password',
+                      hintText: ' set Password',
                       suffixIcon: Icon(Icons.remove_red_eye),
                     ),
                     validator: (String? value){
@@ -73,7 +73,7 @@ class _SignUpState extends State<SignUp> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      hintText: 'Password',
+                      hintText: 'Confirm Password',
                       suffixIcon: Icon(Icons.remove_red_eye),
                     ),
                     validator: (String? value){

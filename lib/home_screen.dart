@@ -67,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
             itemBuilder: (context, index) {
               final student = _studentList[index];
               return Card(
+                color: Colors.greenAccent,
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 elevation: 3,
                 child: ListTile(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'geo_screen.dart';
 import 'home_screen.dart';
 
 void main() {
@@ -13,7 +14,7 @@ class MyMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: HomeScreen(),
+      home: GeoHomeScreen(),
     );
   }
 }

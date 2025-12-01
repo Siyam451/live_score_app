@@ -11,48 +11,86 @@ class GeoHomeScreen extends StatefulWidget {
 class _GeoHomeScreenState extends State<GeoHomeScreen> {
   Position? _currentPoision;
    Future<void> _getcurrentlocation() async{
-    //access permission given or not
-    LocationPermission permissionstatus = await Geolocator.checkPermission();
-    if(_ispermissionGranted(permissionstatus)) {
-      //GPS service enable or not
-      bool isServiceEnable = await Geolocator.isLocationServiceEnabled();
-      if (isServiceEnable) {
-        //get current location
-        _currentPoision = await Geolocator.getCurrentPosition();
-        print(_currentPoision);
-        setState(() {
-
-        });
-      } else {
-        // reqest service
-        Geolocator.openLocationSettings();
-      }
-    }
-    else{
-      //request location permission
-      LocationPermission permissionstatus = await Geolocator.requestPermission();
-      if(_ispermissionGranted(permissionstatus)){
-        //call this method again
-        _getcurrentlocation();
-
-      }
-    }
-  }
+//access permission given or not
+//      LocationPermission permissionstatus = await Geolocator.checkPermission();
+//      if(_ispermissionGranted(permissionstatus)) {
+//        //GPS service enable or not
+//        bool isServiceEnable = await Geolocator.isLocationServiceEnabled();
+//        if (isServiceEnable) {
+//          //get current location
+//          _currentPoision = await Geolocator.getCurrentPosition();
+//          print(_currentPoision);
+//          setState(() {
+//
+//          });
+//        } else {
+//          // reqest service
+//          Geolocator.openLocationSettings();
+//        }
+//      }
+//      else{
+//        //request location permission
+//        LocationPermission permissionstatus = await Geolocator.requestPermission();
+//        if(_ispermissionGranted(permissionstatus)){
+//          //call this method again
+//          _getcurrentlocation();
+//
+//        }
+//      }
+     await _handleLocationPermisson(() async {
+       _currentPoision = await Geolocator.getCurrentPosition();
+       print(_currentPoision);
+       setState(() {});
+     });
+   }
   //use to see real time change ..mae user kkhn koi jacce tao dekte parbo
-   Future<void> _Listencurrentlocation()async{
-    //access given or not
+     Future<void> _listencurrentlocation() async {
+
+     //access given or not
+     // LocationPermission permissionstatus=await Geolocator.checkPermission();
+     // if(_ispermissionGranted(permissionstatus)){
+     //   //gps service enable
+     //   bool isServiceEnable = await Geolocator.isLocationServiceEnabled();
+     //   if(isServiceEnable){
+     //     // current listen location
+     //     Geolocator.getPositionStream().listen((position){
+     //       _currentPoision = position;
+     //       setState(() {
+     //
+     //       });
+     //     });
+     //   } else{
+     //     //request service
+     //     Geolocator.openLocationSettings();
+     //
+     //   }
+     // }
+     // else{
+     //   //reqest location permisson
+     //   LocationPermission permissionstatus = await Geolocator.requestPermission();
+     //   if(_ispermissionGranted(permissionstatus)){
+     //     _getcurrentlocation();
+     //   }
+     // }
+       await _handleLocationPermisson(() {
+         Geolocator.getPositionStream().listen((position) {
+           _currentPoision = position;
+           setState(() {});
+         });
+       });
+     }
+
+
+
+
+  Future<void> _handleLocationPermisson(VoidCallback isSuccess)async{
     LocationPermission permissionstatus=await Geolocator.checkPermission();
     if(_ispermissionGranted(permissionstatus)){
       //gps service enable
       bool isServiceEnable = await Geolocator.isLocationServiceEnabled();
       if(isServiceEnable){
         // current listen location
-        Geolocator.getPositionStream().listen((position){
-          _currentPoision = position;
-          setState(() {
-
-          });
-        });
+   isSuccess();
       } else{
         //request service
         Geolocator.openLocationSettings();
@@ -66,8 +104,8 @@ class _GeoHomeScreenState extends State<GeoHomeScreen> {
         _getcurrentlocation();
       }
     }
-
   }
+
 
 
 
@@ -93,7 +131,7 @@ class _GeoHomeScreenState extends State<GeoHomeScreen> {
             }, child: Text('Current location:')),
 
             TextButton(onPressed: (){
-              _Listencurrentlocation();
+              _listencurrentlocation();
             }, child: Text(' Listen Current location:'))
           ],
         ),
